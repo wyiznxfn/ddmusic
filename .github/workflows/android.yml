@@ -13,6 +13,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
+      # ========== 新增这一行，解决126报错 ==========
+      - name: 给gradlew添加执行权限
+        run: chmod +x ./gradlew
       - name: Build debug APK
         run: ./gradlew :mobile:assembleDebug
       - name: Upload APK

@@ -1,8 +1,7 @@
 name: Android CI
 on:
+  workflow_dispatch:
   push:
-  pull_request:
-  workflow_dispatch: # ✅ 重点：可以手动在Actions页面点运行，适合你编译车机APK
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,9 +14,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew :mobile:assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: ddmusic-apk
+          path: mobile/build/outputs/apk/debug/mobile-debug.apk

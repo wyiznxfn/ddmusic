@@ -9,7 +9,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 关键：换成JDK8！老Gradle6.x唯一稳的版本
       - name: Set up JDK 8
         uses: actions/setup-java@v4
         with:
@@ -25,8 +24,12 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleDebug
 
+      # 重点：全局搜索所有apk，日志输出真实位置
+      - name: Find apk file
+        run: find . -name "*.apk"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ddmusic-apk
-          path: mobile/build/outputs/apk/debug/mobile-debug.apk
+          path: ./**/*.apk

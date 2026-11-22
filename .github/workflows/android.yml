@@ -6,19 +6,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 关键：换成JDK8！老Gradle6.x唯一稳的版本
+      - name: Set up JDK 8
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '8'
           distribution: 'temurin'
           cache: gradle
-      # ========== 新增这一行，解决126报错 ==========
-      - name: 给gradlew添加执行权限
-        run: chmod +x ./gradlew
-      - name: Build debug APK
-        run: ./gradlew :mobile:assembleDebug
-      - name: Upload APK
+
+      - name: Grant execute permission for gradlew
+        run: |
+          ls -la
+          chmod +x gradlew
+      
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ddmusic-apk

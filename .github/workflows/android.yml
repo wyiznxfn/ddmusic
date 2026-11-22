@@ -2,6 +2,7 @@ name: Android CI
 on:
   workflow_dispatch:
   push:
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,7 +25,6 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleDebug
 
-      # 重点：全局搜索所有apk，日志输出真实位置
       - name: Find apk file
         run: find . -name "*.apk"
 
@@ -33,3 +33,9 @@ jobs:
         with:
           name: ddmusic-apk
           path: ./**/*.apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: ./**/*.apk

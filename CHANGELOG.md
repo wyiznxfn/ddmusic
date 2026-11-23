@@ -9,6 +9,35 @@
 
 ---
 
+# 2026-11-23
+
+## 1.0.20：播放次数只统计完整播放 + 列表显示次数
+
+**需求**：1) 播放次数仅完整播完才计；2) 歌曲列表右侧时长位置改为上下两行：上播放次数、下时长。
+
+**改动**：
+- 统计规则：原实现是"开始播放即 +1"（playSongAt 里 increment）。改为只在 `onCompletion` 计数——自然播完、以及单曲循环整曲结束时 +1；手动切歌、中途停止、文件出错跳过均不计
+- `item_song.xml` 右侧单行时长改为竖排两行：`play_count`（N 次，11sp）在上、`duration` 在下
+- `SongAdapter` 绑定 `PlayCountManager.getCount`
+
+**验证**：车机实测通过——列表右侧上行"2 次/0 次"、下行时长；完整播完才计数。
+
+# 2026-11-20
+
+## 1.0.19：清理死代码，包名定为网易云 IoT，语音只走 BYD 通道
+
+**需求**：功能不变，删除所有没用上的布局/类/函数；包名直接用 `com.netease.cloudmusic.iot`；移除全部酷我 action。
+
+**改动**：
+- `applicationId` 固定为 `com.netease.cloudmusic.iot`（小迪白名单身份），移除 testAppId 构建参数机制
+- 删除酷我协议整条链路：`KuwoVoiceReceiver` 重写为 `VoiceReceiver`（只留 BYD `AUTOVOICE_*` 广播 + 系统 `MEDIA_BUTTON` 兜底）；manifest 去掉全部 `cn.kuwo.*` action；删除 `VoiceRelayActivity`（只有酷我 action 会拉起它）及 `VoiceRelayTheme`；删除 MainActivity 里承接酷我 activity intent 的 `handleCarIntent/hasConcreteSongQuery`
+- 删除从未被引用的专辑/歌手页整条死链：`AlbumsFragment`、`ArtistsFragment`、`SongsFragment`、`AlbumAdapter`、`ArtistAdapter`、`Album`、`Artist` 模型、`SongLoader.getAlbums/getArtists`、布局 `fragment_albums/fragment_artists/fragment_songs/item_album/item_artist`
+- 删除无引用的 `MusicPlayerRemote.startAndBindService/cycleRepeatMode/getPosition`、`MusicService.cycleRepeatMode/getPosition`、`drawable/slider_thumb`
+- 功能保持不变：语音点播/随机播放/媒体键、播放页、设置、通知与语音提示开关、仪表盘上报（静默降级）
+
+**验证**：车机实测通过——启动自动注册小迪；`AUTOVOICE_SEARCH(_PLUS)` 点播命中"周杰伦-晴天"并播放；
+媒体键下一曲/暂停/恢复均正常；媒体按钮会话归属本应用。
+
 # 2026-11-19
 
 ## 1.0.17：声明 BYDAUTO_INSTRUMENT_COMMON，打通仪表盘直推
